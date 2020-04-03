@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Day06 {
 
     public static void main(String[] args) {
@@ -65,19 +68,44 @@ public class Day06 {
     public static void populateGraph(String input) {
         String nodeCoordinates[] = input.split("[\n]");
         String[][] field = new String[10][10];
-//        for(String coordinates : nodeCoordinates){
-//
-//        }
+        List<Day06Node> nodes = new ArrayList<Day06Node>();
 
-        int xNode = 8;
-        int yNode = 3;
-        field[xNode][yNode] = "C";
+        Day06Node nodeA = new Day06Node();
+        Day06Node nodeC = new Day06Node();
+
+        nodeA.setX(1);
+        nodeA.setY(1);
+        nodeA.setName("A");
+        field[nodeA.getX()][nodeA.getY()] = nodeA.getName();
+
+        nodeC.setX(8);
+        nodeC.setY(3);
+        nodeC.setName("C");
+        field[nodeC.getX()][nodeC.getY()] = nodeC.getName();
+
+        nodes.add(nodeA);
+        nodes.add(nodeC);
+
 
         for (int xField = 0; xField < field.length; xField++) {
             for (int yField = 0; yField < field[9].length; yField++) {
-            field[xField][yField] = String.valueOf(Math.abs(xField-xNode) + Math.abs(yField-xNode));
+
+                int lowestManhattanDistance = Integer.MAX_VALUE;
+                for (Day06Node node : nodes) {
+                    int manhattanDistance = Math.abs(xField - node.getX()) + Math.abs(yField - node.getY());
+                    if(manhattanDistance<lowestManhattanDistance){
+                        lowestManhattanDistance =manhattanDistance;
+                    } else if(manhattanDistance==lowestManhattanDistance){
+                        lowestManhattanDistance = 0;
+                    }
+                }
+
+                if (lowestManhattanDistance != 0) {
+                    field[xField][yField] = String.valueOf(lowestManhattanDistance);
+                }
             }
         }
+        System.out.println();
 
         for (int yField = 0; yField < field[9].length; yField++) {
             for (int xField = 0; xField < field.length; xField++) {
