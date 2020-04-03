@@ -58,5 +58,32 @@ public class Day06 {
                 "3, 4\n" +
                 "5, 5\n" +
                 "8, 9";
+
+        populateGraph(input);
+    }
+
+    public static void populateGraph(String input) {
+        String nodeCoordinates[] = input.split("[\n]");
+        String[][] field = new String[10][10];
+//        for(String coordinates : nodeCoordinates){
+//
+//        }
+
+        int xNode = 8;
+        int yNode = 3;
+        field[xNode][yNode] = "C";
+
+        for (int xField = 0; xField < field.length; xField++) {
+            for (int yField = 0; yField < field[9].length; yField++) {
+            field[xField][yField] = String.valueOf(Math.abs(xField-xNode) + Math.abs(yField-xNode));
+            }
+        }
+
+        for (int yField = 0; yField < field[9].length; yField++) {
+            for (int xField = 0; xField < field.length; xField++) {
+                System.out.print(field[xField][yField] + " ");
+            }
+            System.out.println();
+        }
     }
 }
