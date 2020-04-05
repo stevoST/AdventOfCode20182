@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
-
 public class Day06 {
 
     public static void main(String[] args) {
@@ -62,51 +59,58 @@ public class Day06 {
                 "5, 5\n" +
                 "8, 9";
 
-        populateGraph(input);
+        String[][] populatedGraph = populateGraph(testInput);
+        printGraph(populatedGraph);
     }
 
-    public static void populateGraph(String input) {
+    public static String[][] populateGraph(String input) {
         String nodeCoordinates[] = input.split("[\n]");
         String[][] field = new String[10][10];
-        List<Day06Node> nodes = new ArrayList<Day06Node>();
-
-        Day06Node nodeA = new Day06Node();
-        Day06Node nodeC = new Day06Node();
-
-        nodeA.setX(1);
-        nodeA.setY(1);
-        nodeA.setName("A");
-        field[nodeA.getX()][nodeA.getY()] = nodeA.getName();
-
-        nodeC.setX(8);
-        nodeC.setY(3);
-        nodeC.setName("C");
-        field[nodeC.getX()][nodeC.getY()] = nodeC.getName();
-
-        nodes.add(nodeA);
-        nodes.add(nodeC);
 
 
         for (int xField = 0; xField < field.length; xField++) {
             for (int yField = 0; yField < field[9].length; yField++) {
 
                 int lowestManhattanDistance = Integer.MAX_VALUE;
-                for (Day06Node node : nodes) {
-                    int manhattanDistance = Math.abs(xField - node.getX()) + Math.abs(yField - node.getY());
-                    if(manhattanDistance<lowestManhattanDistance){
-                        lowestManhattanDistance =manhattanDistance;
-                    } else if(manhattanDistance==lowestManhattanDistance){
+                int lowestSameManhattanDistancOfTwoPoints = 0;
+
+                for (String node : nodeCoordinates) {
+                    String[] nodePosition = node.split(",");
+                    int xNode = Integer.valueOf(nodePosition[0].trim());
+                    int yNode = Integer.valueOf(nodePosition[1].trim());
+                    int manhattanDistance = Math.abs(xField - xNode) + Math.abs(yField - yNode);
+
+                    if (xField == 4 && yField == 4) {
+//                        System.out.println("test");
+                    }
+                    if (manhattanDistance == 0) {
+                        field[xField][yField] = "0";
                         lowestManhattanDistance = 0;
+                    } else if (manhattanDistance == lowestManhattanDistance) {
+                        lowestSameManhattanDistancOfTwoPoints = manhattanDistance;
+                        lowestManhattanDistance = -1;
+                    } else if (manhattanDistance < lowestManhattanDistance || manhattanDistance < lowestSameManhattanDistancOfTwoPoints) {
+                        lowestManhattanDistance = manhattanDistance;
+                    } else if (manhattanDistance == lowestManhattanDistance) {
+                        lowestManhattanDistance = -1;
                     }
                 }
 
-                if (lowestManhattanDistance != 0) {
+                if (lowestManhattanDistance > 0) {
                     field[xField][yField] = String.valueOf(lowestManhattanDistance);
+//                    field[xField][yField] = closestNode.toString();
+                } else if (lowestManhattanDistance == -1) {
+                    field[xField][yField] = ".";
+                } else if (lowestManhattanDistance == 0) {
+                    field[xField][yField] = "0";
                 }
             }
         }
         System.out.println();
+        return field;
+    }
 
+    public static void printGraph(String[][] field){
         for (int yField = 0; yField < field[9].length; yField++) {
             for (int xField = 0; xField < field.length; xField++) {
                 System.out.print(field[xField][yField] + " ");
