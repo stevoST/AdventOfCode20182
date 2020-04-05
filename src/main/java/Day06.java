@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 public class Day06 {
 
     public static void main(String[] args) {
@@ -59,50 +62,55 @@ public class Day06 {
                 "5, 5\n" +
                 "8, 9";
 
-        String[][] populatedGraph = populateGraph(testInput);
-        printGraph(populatedGraph);
+        int fieldDimension = 10;
+
+        String[][] populatedGraph = populateGraph(testInput, fieldDimension);
+        printGraph(populatedGraph, fieldDimension);
+        Map<String, Integer> countedNodes = countNodeAreas(populatedGraph, fieldDimension);
+        System.out.println(findMaxValueInMap(countedNodes));
     }
 
-    public static String[][] populateGraph(String input) {
+    public static String[][] populateGraph(String input, int fieldDimension) {
         String nodeCoordinates[] = input.split("[\n]");
-        String[][] field = new String[10][10];
+        String[][] field = new String[fieldDimension][fieldDimension];
 
 
         for (int xField = 0; xField < field.length; xField++) {
-            for (int yField = 0; yField < field[9].length; yField++) {
+            for (int yField = 0; yField < field[fieldDimension-1].length; yField++) {
 
                 int lowestManhattanDistance = Integer.MAX_VALUE;
                 int lowestSameManhattanDistancOfTwoPoints = 0;
+                int selectedNode = 0;
 
-                for (String node : nodeCoordinates) {
-                    String[] nodePosition = node.split(",");
+                for (int nodeNumber = 0; nodeNumber < nodeCoordinates.length; nodeNumber++) {
+                    String[] nodePosition = nodeCoordinates[nodeNumber].split(",");
                     int xNode = Integer.valueOf(nodePosition[0].trim());
                     int yNode = Integer.valueOf(nodePosition[1].trim());
                     int manhattanDistance = Math.abs(xField - xNode) + Math.abs(yField - yNode);
 
-                    if (xField == 4 && yField == 4) {
-//                        System.out.println("test");
-                    }
                     if (manhattanDistance == 0) {
-                        field[xField][yField] = "0";
                         lowestManhattanDistance = 0;
+                        selectedNode = nodeNumber;
                     } else if (manhattanDistance == lowestManhattanDistance) {
                         lowestSameManhattanDistancOfTwoPoints = manhattanDistance;
                         lowestManhattanDistance = -1;
+                        selectedNode = nodeNumber;
                     } else if (manhattanDistance < lowestManhattanDistance || manhattanDistance < lowestSameManhattanDistancOfTwoPoints) {
+                        selectedNode = nodeNumber;
                         lowestManhattanDistance = manhattanDistance;
                     } else if (manhattanDistance == lowestManhattanDistance) {
+                        selectedNode = nodeNumber;
                         lowestManhattanDistance = -1;
                     }
                 }
 
                 if (lowestManhattanDistance > 0) {
-                    field[xField][yField] = String.valueOf(lowestManhattanDistance);
-//                    field[xField][yField] = closestNode.toString();
+//                    field[xField][yField] = String.valueOf(lowestManhattanDistance);
+                    field[xField][yField] = String.valueOf(selectedNode);
                 } else if (lowestManhattanDistance == -1) {
                     field[xField][yField] = ".";
                 } else if (lowestManhattanDistance == 0) {
-                    field[xField][yField] = "0";
+                    field[xField][yField] = String.valueOf(selectedNode);
                 }
             }
         }
@@ -110,12 +118,44 @@ public class Day06 {
         return field;
     }
 
-    public static void printGraph(String[][] field){
-        for (int yField = 0; yField < field[9].length; yField++) {
+    public static void printGraph(String[][] field, int fieldDimension) {
+        for (int yField = 0; yField < field[fieldDimension-1].length; yField++) {
             for (int xField = 0; xField < field.length; xField++) {
                 System.out.print(field[xField][yField] + " ");
             }
             System.out.println();
         }
+
+    }
+
+    public static Map<String, Integer> countNodeAreas(String[][] field, int fieldDimension) {
+        Map<String, Integer> nodeSize = new HashMap<String, Integer>();
+        for (int xField = 0; xField < field.length; xField++) {
+            for (int yField = 0; yField < field[fieldDimension-1].length; yField++) {
+                if (nodeSize.containsKey(field[xField][yField])) {
+                    int currentvalue = 0;
+                    if (xField == 0 || yField == 0 || xField == fieldDimension-1 || yField == fieldDimension-1) {
+                        currentvalue = Integer.MIN_VALUE;
+                    } else {
+                        currentvalue = nodeSize.get(field[xField][yField]);
+                    }
+                    nodeSize.put(field[xField][yField], ++currentvalue);
+                } else {
+                    nodeSize.put(field[xField][yField], 1);
+                }
+            }
+        }
+        return nodeSize;
+    }
+
+    public static <K, V extends Comparable<V>> V findMaxValueInMap(Map<K, V> nodeSize) {
+        Map.Entry<K, V> maxEntry = null;
+        for (Map.Entry<K, V> entry : nodeSize.entrySet()) {
+            if (maxEntry == null || entry.getValue()
+                    .compareTo(maxEntry.getValue()) > 0) {
+                maxEntry = entry;
+            }
+        }
+        return maxEntry.getValue();
     }
 }
