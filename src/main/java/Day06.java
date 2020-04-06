@@ -62,12 +62,12 @@ public class Day06 {
                 "5, 5\n" +
                 "8, 9";
 
-        int fieldDimension = 10;
+        int fieldDimension = 400;
 
-        String[][] populatedGraph = populateGraph(testInput, fieldDimension);
+        String[][] populatedGraph = populateGraph(input, fieldDimension);
         printGraph(populatedGraph, fieldDimension);
         Map<String, Integer> countedNodes = countNodeAreas(populatedGraph, fieldDimension);
-        System.out.println(findMaxValueInMap(countedNodes));
+        System.out.println("Biggest area that is not infinite is: " + findMaxValueInMap(countedNodes));
     }
 
     public static String[][] populateGraph(String input, int fieldDimension) {
@@ -76,12 +76,15 @@ public class Day06 {
 
 
         for (int xField = 0; xField < field.length; xField++) {
-            for (int yField = 0; yField < field[fieldDimension-1].length; yField++) {
+            for (int yField = 0; yField < field[fieldDimension - 1].length; yField++) {
 
                 int lowestManhattanDistance = Integer.MAX_VALUE;
                 int lowestSameManhattanDistancOfTwoPoints = 0;
                 int selectedNode = 0;
 
+                if (xField == 4 && yField == 4) {
+                    System.out.println("");
+                }
                 for (int nodeNumber = 0; nodeNumber < nodeCoordinates.length; nodeNumber++) {
                     String[] nodePosition = nodeCoordinates[nodeNumber].split(",");
                     int xNode = Integer.valueOf(nodePosition[0].trim());
@@ -95,9 +98,13 @@ public class Day06 {
                         lowestSameManhattanDistancOfTwoPoints = manhattanDistance;
                         lowestManhattanDistance = -1;
                         selectedNode = nodeNumber;
-                    } else if (manhattanDistance < lowestManhattanDistance || manhattanDistance < lowestSameManhattanDistancOfTwoPoints) {
+                    } else if (manhattanDistance < lowestManhattanDistance) {
                         selectedNode = nodeNumber;
                         lowestManhattanDistance = manhattanDistance;
+                    } else if (manhattanDistance < lowestSameManhattanDistancOfTwoPoints) {
+                        selectedNode = nodeNumber;
+                        lowestManhattanDistance = manhattanDistance;
+                        lowestSameManhattanDistancOfTwoPoints = 0;
                     } else if (manhattanDistance == lowestManhattanDistance) {
                         selectedNode = nodeNumber;
                         lowestManhattanDistance = -1;
@@ -111,15 +118,15 @@ public class Day06 {
                     field[xField][yField] = ".";
                 } else if (lowestManhattanDistance == 0) {
                     field[xField][yField] = String.valueOf(selectedNode);
+//                    field[xField][yField] = "0";
                 }
             }
         }
-        System.out.println();
         return field;
     }
 
     public static void printGraph(String[][] field, int fieldDimension) {
-        for (int yField = 0; yField < field[fieldDimension-1].length; yField++) {
+        for (int yField = 0; yField < field[fieldDimension - 1].length; yField++) {
             for (int xField = 0; xField < field.length; xField++) {
                 System.out.print(field[xField][yField] + " ");
             }
@@ -130,16 +137,21 @@ public class Day06 {
 
     public static Map<String, Integer> countNodeAreas(String[][] field, int fieldDimension) {
         Map<String, Integer> nodeSize = new HashMap<String, Integer>();
+        int test = 0;
+
         for (int xField = 0; xField < field.length; xField++) {
-            for (int yField = 0; yField < field[fieldDimension-1].length; yField++) {
+            for (int yField = 0; yField < field[fieldDimension - 1].length; yField++) {
+                if (field[xField][yField].equals("3")) {
+//                    System.out.println(++test);
+                }
                 if (nodeSize.containsKey(field[xField][yField])) {
-                    int currentvalue = 0;
+                    int currentValue = 0;
                     if (xField == 0 || yField == 0 || xField == fieldDimension-1 || yField == fieldDimension-1) {
-                        currentvalue = Integer.MIN_VALUE;
+                        currentValue = Integer.MIN_VALUE;
                     } else {
-                        currentvalue = nodeSize.get(field[xField][yField]);
+                    currentValue = nodeSize.get(field[xField][yField]);
                     }
-                    nodeSize.put(field[xField][yField], ++currentvalue);
+                    nodeSize.put(field[xField][yField], ++currentValue);
                 } else {
                     nodeSize.put(field[xField][yField], 1);
                 }
