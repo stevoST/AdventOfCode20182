@@ -63,17 +63,18 @@ public class Day06 {
                 "8, 9";
 
         int fieldDimension = 400;
+        int totalDistanceToAllNodesShorterThan = 10000;
 
-        String[][] populatedGraph = populateGraph(input, fieldDimension);
-        printGraph(populatedGraph, fieldDimension);
+        String[][] populatedGraph = populateGraph(input, fieldDimension, totalDistanceToAllNodesShorterThan);
+//        printGraph(populatedGraph, fieldDimension);
         Map<String, Integer> countedNodes = countNodeAreas(populatedGraph, fieldDimension);
-        System.out.println("Biggest area that is not infinite is: " + findMaxValueInMap(countedNodes));
+        System.out.println("Part1: Biggest area that is not infinite is: " + findMaxValueInMap(countedNodes));
     }
 
-    public static String[][] populateGraph(String input, int fieldDimension) {
+    public static String[][] populateGraph(String input, int fieldDimension, int totalDistanceToAllNodesShorterThan) {
         String nodeCoordinates[] = input.split("[\n]");
         String[][] field = new String[fieldDimension][fieldDimension];
-
+        int countPointsClosestToAllNodes = 0;
 
         for (int xField = 0; xField < field.length; xField++) {
             for (int yField = 0; yField < field[fieldDimension - 1].length; yField++) {
@@ -81,15 +82,14 @@ public class Day06 {
                 int lowestManhattanDistance = Integer.MAX_VALUE;
                 int lowestSameManhattanDistancOfTwoPoints = 0;
                 int selectedNode = 0;
+                int countDistanceToAllNodes = 0;
 
-                if (xField == 4 && yField == 4) {
-                    System.out.println("");
-                }
                 for (int nodeNumber = 0; nodeNumber < nodeCoordinates.length; nodeNumber++) {
                     String[] nodePosition = nodeCoordinates[nodeNumber].split(",");
                     int xNode = Integer.valueOf(nodePosition[0].trim());
                     int yNode = Integer.valueOf(nodePosition[1].trim());
                     int manhattanDistance = Math.abs(xField - xNode) + Math.abs(yField - yNode);
+                    countDistanceToAllNodes += manhattanDistance;
 
                     if (manhattanDistance == 0) {
                         lowestManhattanDistance = 0;
@@ -111,6 +111,10 @@ public class Day06 {
                     }
                 }
 
+                if (countDistanceToAllNodes < totalDistanceToAllNodesShorterThan) {
+                    countPointsClosestToAllNodes++;
+                }
+
                 if (lowestManhattanDistance > 0) {
 //                    field[xField][yField] = String.valueOf(lowestManhattanDistance);
                     field[xField][yField] = String.valueOf(selectedNode);
@@ -122,6 +126,7 @@ public class Day06 {
                 }
             }
         }
+        System.out.println("Part2: Number of points closer than " + totalDistanceToAllNodesShorterThan + " is " + countPointsClosestToAllNodes);
         return field;
     }
 
@@ -141,15 +146,12 @@ public class Day06 {
 
         for (int xField = 0; xField < field.length; xField++) {
             for (int yField = 0; yField < field[fieldDimension - 1].length; yField++) {
-                if (field[xField][yField].equals("3")) {
-//                    System.out.println(++test);
-                }
                 if (nodeSize.containsKey(field[xField][yField])) {
                     int currentValue = 0;
-                    if (xField == 0 || yField == 0 || xField == fieldDimension-1 || yField == fieldDimension-1) {
+                    if (xField == 0 || yField == 0 || xField == fieldDimension - 1 || yField == fieldDimension - 1) {
                         currentValue = Integer.MIN_VALUE;
                     } else {
-                    currentValue = nodeSize.get(field[xField][yField]);
+                        currentValue = nodeSize.get(field[xField][yField]);
                     }
                     nodeSize.put(field[xField][yField], ++currentValue);
                 } else {
