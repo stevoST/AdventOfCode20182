@@ -1,4 +1,9 @@
-import java.util.Arrays;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Day07 {
 
@@ -116,15 +121,91 @@ public class Day07 {
 
         String[] inputArray = input.split("\n");
         String[] inputSortedBySecondLetter = new String[101];
-        Arrays.sort(inputArray);
+
+        Multimap<Character, Character> preLetterMap = HashMultimap.create();
+        Multimap<Character, Character> postLetterMap = HashMultimap.create();
+        Set<Character> availableLetters = new HashSet<Character>();
+
+
         for (int line = 0; line < inputArray.length; line++) {
-            inputSortedBySecondLetter[line] = String.valueOf(inputArray[line].charAt(36));
+
+            Pattern pattern = Pattern.compile("Step ([A-Z]).+step ([A-Z]).+");
+            Matcher matcher = pattern.matcher(inputArray[line]);
+
+            char firstLetter = '.';
+            char lastLetter = '.';
+            while (matcher.find()) {
+                firstLetter = (matcher.group(1)).charAt(0);
+                lastLetter = (matcher.group(2)).charAt(0);
+            }
+
+            preLetterMap.put(lastLetter, firstLetter);
+            postLetterMap.put( firstLetter,lastLetter);
+            availableLetters.add(firstLetter);
+            availableLetters.add(lastLetter);
         }
 
-        Arrays.sort(inputSortedBySecondLetter);
+        availableLetters.removeAll(preLetterMap.keys());
+        char rootLeter = availableLetters.iterator().next().charValue();
+        availableLetters.remove(rootLeter);
 
-        for (int line = 0; line < inputSortedBySecondLetter.length; line++) {
-            System.out.println(inputSortedBySecondLetter[line]);
+        Collection<Character> childs = postLetterMap.get(rootLeter);
+        for (Character childLetter : childs){
+            availableLetters.add(childLetter);
+            System.out.println(childLetter);
         }
+
+        LinkedHashSet<Character> finalLetters = new LinkedHashSet<>();
+        finalLetters.add(rootLeter);
+
+        char lowestLetter = '^';
+        for(Character letter : availableLetters){
+            if(letter < lowestLetter){
+                lowestLetter = letter;
+            }
+        }
+        finalLetters.add(lowestLetter);
+        availableLetters.remove(lowestLetter);
+
+
+
+        childs = postLetterMap.get(lowestLetter);
+        lowestLetter = '^';
+        for(Character letter : childs){
+            if(letter < lowestLetter){
+                lowestLetter = letter;
+            }
+        }
+
+        finalLetters.add(lowestLetter);
+        childs.remove(lowestLetter);
+        availableLetters.addAll(childs);
+
+
+
+        childs = postLetterMap.get(lowestLetter);
+        lowestLetter = '^';
+        for(Character letter : childs){
+            if(letter < lowestLetter){
+                lowestLetter = letter;
+            }
+        }
+        if(!postLetterMap.get(lowestLetter).isEmpty()) {
+            finalLetters.add(lowestLetter);
+        }
+        childs.remove(lowestLetter);
+        availableLetters.addAll(childs);
+
+        char lastLetterInWord = '^';
+        Collection<Character> previousLetters = null;
+        if(postLetterMap.get(lowestLetter).isEmpty()){
+            lastLetterInWord = lowestLetter;
+            previousLetters = preLetterMap.get(lastLetterInWord);
+            previousLetters.removeAll(finalLetters);
+            System.out.println();
+        }
+
+
+        System.out.println();
     }
 }
