@@ -120,11 +120,13 @@ public class Day07 {
 
 
         String[] inputArray = input.split("\n");
-        String[] inputSortedBySecondLetter = new String[101];
 
         Multimap<Character, Character> preLetterMap = HashMultimap.create();
         Multimap<Character, Character> postLetterMap = HashMultimap.create();
-        Set<Character> availableLetters = new HashSet<Character>();
+        Set<Character> allLetters = new HashSet<Character>();
+        List<Character> finalWord = new ArrayList<>();
+        SortedSet<Character> availableLetters = new TreeSet<>();
+        char lastLetterInWord = 0;
 
 
         for (int line = 0; line < inputArray.length; line++) {
@@ -141,71 +143,26 @@ public class Day07 {
 
             preLetterMap.put(lastLetter, firstLetter);
             postLetterMap.put( firstLetter,lastLetter);
-            availableLetters.add(firstLetter);
-            availableLetters.add(lastLetter);
+            allLetters.add(firstLetter);
+            allLetters.add(lastLetter);
         }
 
+        availableLetters.addAll(allLetters);
         availableLetters.removeAll(preLetterMap.keys());
-        char rootLeter = availableLetters.iterator().next().charValue();
-        availableLetters.remove(rootLeter);
 
-        Collection<Character> childs = postLetterMap.get(rootLeter);
-        for (Character childLetter : childs){
-            availableLetters.add(childLetter);
-            System.out.println(childLetter);
-        }
-
-        LinkedHashSet<Character> finalLetters = new LinkedHashSet<>();
-        finalLetters.add(rootLeter);
-
-        char lowestLetter = '^';
-        for(Character letter : availableLetters){
-            if(letter < lowestLetter){
-                lowestLetter = letter;
+        while(!availableLetters.isEmpty()){
+            char parentLetter = availableLetters.iterator().next().charValue();
+            availableLetters.remove(parentLetter);
+            if(postLetterMap.get(parentLetter).size()==0){
+                lastLetterInWord = parentLetter;
+            } else {
+                finalWord.add(parentLetter);
+//                postLetterMap.get(parentLetter).removeAll(finalWord);
+                availableLetters.addAll(postLetterMap.get(parentLetter));
             }
         }
-        finalLetters.add(lowestLetter);
-        availableLetters.remove(lowestLetter);
+        finalWord.add(lastLetterInWord);
+        System.out.println(finalWord.toString().replaceAll(", ", ""));
 
-
-
-        childs = postLetterMap.get(lowestLetter);
-        lowestLetter = '^';
-        for(Character letter : childs){
-            if(letter < lowestLetter){
-                lowestLetter = letter;
-            }
-        }
-
-        finalLetters.add(lowestLetter);
-        childs.remove(lowestLetter);
-        availableLetters.addAll(childs);
-
-
-
-        childs = postLetterMap.get(lowestLetter);
-        lowestLetter = '^';
-        for(Character letter : childs){
-            if(letter < lowestLetter){
-                lowestLetter = letter;
-            }
-        }
-        if(!postLetterMap.get(lowestLetter).isEmpty()) {
-            finalLetters.add(lowestLetter);
-        }
-        childs.remove(lowestLetter);
-        availableLetters.addAll(childs);
-
-        char lastLetterInWord = '^';
-        Collection<Character> previousLetters = null;
-        if(postLetterMap.get(lowestLetter).isEmpty()){
-            lastLetterInWord = lowestLetter;
-            previousLetters = preLetterMap.get(lastLetterInWord);
-            previousLetters.removeAll(finalLetters);
-            System.out.println();
-        }
-
-
-        System.out.println();
     }
 }
