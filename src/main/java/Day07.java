@@ -149,20 +149,37 @@ public class Day07 {
 
         availableLetters.addAll(allLetters);
         availableLetters.removeAll(preLetterMap.keys());
+        while(!availableLetters.isEmpty()) {
 
-        while(!availableLetters.isEmpty()){
             char parentLetter = availableLetters.iterator().next().charValue();
-            availableLetters.remove(parentLetter);
-            if(postLetterMap.get(parentLetter).size()==0){
-                lastLetterInWord = parentLetter;
-            } else {
-                finalWord.add(parentLetter);
+            lastLetterInWord = 0;
+
+            while (lastLetterInWord == 0) {
+//            char parentLetter = availableLetters.iterator().next().charValue();
+                availableLetters.remove(parentLetter);
+                if (postLetterMap.get(parentLetter).size() == 0) {
+                    lastLetterInWord = parentLetter;
+                } else {
+                    finalWord.add(parentLetter);
 //                postLetterMap.get(parentLetter).removeAll(finalWord);
-                availableLetters.addAll(postLetterMap.get(parentLetter));
+//                availableLetters.addAll(postLetterMap.get(parentLetter));
+
+                    Collection<Character> childLetters = postLetterMap.get(parentLetter);
+                    childLetters.removeAll(finalWord);
+                    parentLetter = '^';
+                    for (char childLetter : childLetters) {
+                        if (childLetter < parentLetter) {
+                            parentLetter = childLetter;
+                        }
+                    }
+                    childLetters.remove(parentLetter);
+                    availableLetters.addAll(childLetters);
+                }
             }
         }
         finalWord.add(lastLetterInWord);
         System.out.println(finalWord.toString().replaceAll(", ", ""));
+        System.out.println(finalWord.size());
 
     }
 }
