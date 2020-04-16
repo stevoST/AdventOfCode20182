@@ -1,6 +1,3 @@
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -120,13 +117,9 @@ public class Day07 {
 
 
         String[] inputArray = input.split("\n");
-
-        Multimap<Character, Character> preLetterMap = HashMultimap.create();
-        Multimap<Character, Character> postLetterMap = HashMultimap.create();
-        Set<Character> allLetters = new HashSet<Character>();
+        Set<Character> availableLetters = new HashSet<>();
         List<Character> finalWord = new ArrayList<>();
-        SortedSet<Character> availableLetters = new TreeSet<>();
-        char lastLetterInWord = 0;
+        List<char[]> relatedLettersList = new ArrayList<>();
 
 
         for (int line = 0; line < inputArray.length; line++) {
@@ -140,46 +133,45 @@ public class Day07 {
                 firstLetter = (matcher.group(1)).charAt(0);
                 lastLetter = (matcher.group(2)).charAt(0);
             }
+            availableLetters.add(firstLetter);
+            availableLetters.add(lastLetter);
 
-            preLetterMap.put(lastLetter, firstLetter);
-            postLetterMap.put( firstLetter,lastLetter);
-            allLetters.add(firstLetter);
-            allLetters.add(lastLetter);
+            char[] relatedLetters2 = new char[2];
+            relatedLetters2[0]=firstLetter;
+            relatedLetters2[1]=lastLetter;
+            relatedLettersList.add(relatedLetters2);
+
         }
 
-        availableLetters.addAll(allLetters);
-        availableLetters.removeAll(preLetterMap.keys());
-        while(!availableLetters.isEmpty()) {
+        while (!relatedLettersList.isEmpty()) {
+            Set<Character> preConditions = new HashSet<>();
+            Set<Character> postConditions = new HashSet<>();
+            SortedSet<Character> candidates = new TreeSet<>();
 
-            char parentLetter = availableLetters.iterator().next().charValue();
-            lastLetterInWord = 0;
+            for (char[] relatedLetter : relatedLettersList) {
+                preConditions.add(relatedLetter[0]);
+                postConditions.add(relatedLetter[1]);
+            }
 
-            while (lastLetterInWord == 0) {
-//            char parentLetter = availableLetters.iterator().next().charValue();
-                availableLetters.remove(parentLetter);
-                if (postLetterMap.get(parentLetter).size() == 0) {
-                    lastLetterInWord = parentLetter;
-                } else {
-                    finalWord.add(parentLetter);
-//                postLetterMap.get(parentLetter).removeAll(finalWord);
-//                availableLetters.addAll(postLetterMap.get(parentLetter));
-
-                    Collection<Character> childLetters = postLetterMap.get(parentLetter);
-                    childLetters.removeAll(finalWord);
-                    parentLetter = '^';
-                    for (char childLetter : childLetters) {
-                        if (childLetter < parentLetter) {
-                            parentLetter = childLetter;
-                        }
-                    }
-                    childLetters.remove(parentLetter);
-                    availableLetters.addAll(childLetters);
+            for (int line = 0; line < relatedLettersList.size(); line++) {
+                char preCondLetter = relatedLettersList.get(line)[0];
+                if (!postConditions.contains(preCondLetter)) {
+                    candidates.add(preCondLetter);
                 }
             }
+
+            char finalLetter = candidates.iterator().next().charValue();
+            finalWord.add(finalLetter);
+
+            if(relatedLettersList.size()==1){
+                char lastLetterInFinalWord = relatedLettersList.get(0)[1];
+                finalWord.add(lastLetterInFinalWord);
+            }
+
+            relatedLettersList.removeIf(letter -> letter[0] == finalLetter);
         }
-        finalWord.add(lastLetterInWord);
-        System.out.println(finalWord.toString().replaceAll(", ", ""));
-        System.out.println(finalWord.size());
+
+            System.out.println(finalWord.toString().replaceAll(", ", ""));
 
     }
 }
