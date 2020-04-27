@@ -1,4 +1,5 @@
 import com.google.common.collect.Sets;
+import org.javatuples.Pair;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -118,12 +119,14 @@ public class Day07part2 {
                 "Step F must be finished before step E can begin.";
 
 
-        String[] inputArray = input.split("\n");
+        int numberOfWorkers = 5;
+        String[] inputArray = testInput.split("\n");
+        List<Pair<Integer, Character>> workersList = new ArrayList<>();
+        Pair<Integer, Character>[] workersArray = new Pair[numberOfWorkers];
         Set<Character> availableLetters = new HashSet<>();
         List<Character> finalWord = new ArrayList<>();
         List<char[]> relatedLettersList = new ArrayList<>();
         int time = 0;
-
 
         for (int line = 0; line < inputArray.length; line++) {
 
@@ -167,22 +170,21 @@ public class Day07part2 {
 //                System.out.println(candidates);
 
             char finalLetter = candidates.iterator().next().charValue();
-
-            finalWord.add(finalLetter);
-            time += finalLetter - 64;
-
-            if (relatedLettersList.size() == 1) {
-                char lastLetterInFinalWord = relatedLettersList.get(0)[1];
-                finalWord.add(lastLetterInFinalWord);
-                time += lastLetterInFinalWord - 64;
-            }
-
-            for (char[] relatedLetter : relatedLettersList) {
-                if (finalLetter == relatedLetter[0] && relatedLetter[1] == 'L') {
-                    System.out.println(relatedLetter);
-                    finalWord.add(relatedLetter[1]);
+            Iterator iterator = candidates.iterator();
+            int workerNumber = 0;
+            while (iterator.hasNext()){
+                char candidate = (char) iterator.next();
+                int letterTime = candidate-64;
+                if(workersList.size()<=numberOfWorkers) {
+                    workersList.add(Pair.with(letterTime, candidate));
                 }
+                workersArray[workerNumber++] = Pair.with(letterTime,candidate);
             }
+//            Arrays.sort(workersArray);
+
+            Collections.sort(workersList,(Pair<Integer,Character> p1,Pair<Integer,Character> p2)->p1.getValue0().compareTo(p2.getValue0()));
+//            System.out.println(Arrays.toString(workersArray));
+            System.out.println(workersList);
 
             relatedLettersList.removeIf(letter -> letter[0] == finalLetter);
         }
