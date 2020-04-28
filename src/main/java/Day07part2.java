@@ -119,10 +119,9 @@ public class Day07part2 {
                 "Step F must be finished before step E can begin.";
 
 
-        int numberOfWorkers = 5;
+        int numberOfWorkers = 2;
         String[] inputArray = testInput.split("\n");
         List<Pair<Integer, Character>> workersList = new ArrayList<>();
-        Pair<Integer, Character>[] workersArray = new Pair[numberOfWorkers];
         Set<Character> availableLetters = new HashSet<>();
         List<Character> finalWord = new ArrayList<>();
         List<char[]> relatedLettersList = new ArrayList<>();
@@ -169,28 +168,33 @@ public class Day07part2 {
             }
 //                System.out.println(candidates);
 
-            char finalLetter = candidates.iterator().next().charValue();
             Iterator iterator = candidates.iterator();
             int workerNumber = 0;
             while (iterator.hasNext()){
                 char candidate = (char) iterator.next();
                 int letterTime = candidate-64;
-                if(workersList.size()<=numberOfWorkers) {
+                if(workersList.size()<numberOfWorkers) {
                     workersList.add(Pair.with(letterTime, candidate));
                 }
-                workersArray[workerNumber++] = Pair.with(letterTime,candidate);
             }
-//            Arrays.sort(workersArray);
 
-            Collections.sort(workersList,(Pair<Integer,Character> p1,Pair<Integer,Character> p2)->p1.getValue0().compareTo(p2.getValue0()));
-//            System.out.println(Arrays.toString(workersArray));
+//            Collections.sort(workersList,(Pair<Integer,Character> p1,Pair<Integer,Character> p2)->p1.getValue0().compareTo(p2.getValue0()));
+            Collections.sort(workersList,Comparator.comparing(Pair<Integer,Character>::getValue0));
             System.out.println(workersList);
 
-            relatedLettersList.removeIf(letter -> letter[0] == finalLetter);
+            Set<Character> lettersInProgress = new HashSet<>();
+            for(Pair letterInProgress : workersList){
+                lettersInProgress.add((char)letterInProgress.getValue1());
+            }
+
+            char finalLetter = workersList.get(0).getValue1();
+            workersList.remove(0);
+//            relatedLettersList.removeIf(letter -> letter[0] == finalLetter);
+            relatedLettersList.removeIf(letter -> lettersInProgress.contains(letter[0]));
         }
 
-        System.out.println(finalWord.toString().replaceAll(", ", ""));
-        System.out.println(time);
+//        System.out.println(finalWord.toString().replaceAll(", ", ""));
+//        System.out.println(time);
 
     }
 }
