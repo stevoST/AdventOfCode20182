@@ -1,4 +1,3 @@
-import com.google.common.collect.Sets;
 import org.javatuples.Pair;
 
 import java.util.*;
@@ -125,7 +124,7 @@ public class Day07part2 {
         Set<Character> availableLetters = new HashSet<>();
         List<Character> finalWord = new ArrayList<>();
         List<char[]> relatedLettersList = new ArrayList<>();
-        int time = 0;
+        int totalTime = 0;
 
         for (int line = 0; line < inputArray.length; line++) {
 
@@ -148,8 +147,8 @@ public class Day07part2 {
 
         }
 
-
-        while (!relatedLettersList.isEmpty()) {
+        workersList.add(Pair.with(0, 'a'));
+        while (!workersList.isEmpty()) {
             Set<Character> preConditions = new HashSet<>();
             Set<Character> postConditions = new HashSet<>();
             SortedSet<Character> candidates = new TreeSet<>();
@@ -158,7 +157,6 @@ public class Day07part2 {
                 preConditions.add(relatedLetter[0]);
                 postConditions.add(relatedLetter[1]);
             }
-            char posledneSlovo = Sets.difference(preConditions, postConditions).iterator().next().charValue();
 
             for (int line = 0; line < relatedLettersList.size(); line++) {
                 char preCondLetter = relatedLettersList.get(line)[0];
@@ -166,10 +164,8 @@ public class Day07part2 {
                     candidates.add(preCondLetter);
                 }
             }
-//                System.out.println(candidates);
 
             Iterator iterator = candidates.iterator();
-            int workerNumber = 0;
             while (iterator.hasNext()) {
                 char candidate = (char) iterator.next();
                 int letterTime = candidate - 64;
@@ -187,19 +183,17 @@ public class Day07part2 {
                 lettersInProgress.add((char) letterInProgress.getValue1());
             }
 
-            char finalLetter = workersList.get(0).getValue1();
             int removedLettertime = workersList.get(0).getValue0();
+            totalTime += removedLettertime;
             workersList.remove(0);
-            for (Pair worker : workersList) {
-//                worker.setAt0((int) worker.getValue0() - removedLettertime);
-                worker.setAt0(88);
+            for (int worker = 0; worker<workersList.size(); worker++) {
+                int subtractedTimeFromRemainingLetters = workersList.get(worker).getValue0() - removedLettertime;
+                char letterInProcess = workersList.get(worker).getValue1();
+                workersList.set(worker,Pair.with(subtractedTimeFromRemainingLetters,letterInProcess));
             }
-//            relatedLettersList.removeIf(letter -> letter[0] == finalLetter);
             relatedLettersList.removeIf(letter -> lettersInProgress.contains(letter[0]));
         }
 
-//        System.out.println(finalWord.toString().replaceAll(", ", ""));
-//        System.out.println(time);
-
+        System.out.println(totalTime);
     }
 }
