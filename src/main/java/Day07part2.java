@@ -170,25 +170,30 @@ public class Day07part2 {
 
             Iterator iterator = candidates.iterator();
             int workerNumber = 0;
-            while (iterator.hasNext()){
+            while (iterator.hasNext()) {
                 char candidate = (char) iterator.next();
-                int letterTime = candidate-64;
-                if(workersList.size()<numberOfWorkers) {
+                int letterTime = candidate - 64;
+                if (workersList.size() < numberOfWorkers) {
                     workersList.add(Pair.with(letterTime, candidate));
                 }
             }
 
 //            Collections.sort(workersList,(Pair<Integer,Character> p1,Pair<Integer,Character> p2)->p1.getValue0().compareTo(p2.getValue0()));
-            Collections.sort(workersList,Comparator.comparing(Pair<Integer,Character>::getValue0));
+            Collections.sort(workersList, Comparator.comparing(Pair<Integer, Character>::getValue0));
             System.out.println(workersList);
 
             Set<Character> lettersInProgress = new HashSet<>();
-            for(Pair letterInProgress : workersList){
-                lettersInProgress.add((char)letterInProgress.getValue1());
+            for (Pair letterInProgress : workersList) {
+                lettersInProgress.add((char) letterInProgress.getValue1());
             }
 
             char finalLetter = workersList.get(0).getValue1();
+            int removedLettertime = workersList.get(0).getValue0();
             workersList.remove(0);
+            for (Pair worker : workersList) {
+//                worker.setAt0((int) worker.getValue0() - removedLettertime);
+                worker.setAt0(88);
+            }
 //            relatedLettersList.removeIf(letter -> letter[0] == finalLetter);
             relatedLettersList.removeIf(letter -> lettersInProgress.contains(letter[0]));
         }
