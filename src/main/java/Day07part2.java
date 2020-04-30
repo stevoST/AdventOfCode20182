@@ -119,13 +119,14 @@ public class Day07part2 {
                 "Step F must be finished before step E can begin.";
 
 
-        int numberOfWorkers = 5;
+        int numberOfWorkers = 2;
         int stepTime = 0;
 
         String[] inputArray = testInput.split("\n");
         List<Pair<Integer, Character>> workersList = new ArrayList<>();
         Set<Character> availableLetters = new HashSet<>();
         List<char[]> relatedLettersList = new ArrayList<>();
+        Set<Character> lettersInProgress = new HashSet<>();
         int totalTime = 0;
         char lastLetterInWord = '\u0000';
         int lastLetterInWordTimeToProcess = 0;
@@ -177,7 +178,7 @@ public class Day07part2 {
             while (iterator.hasNext()) {
                 char candidate = (char) iterator.next();
                 int letterTime = candidate - 64 + stepTime;
-                if (workersList.size() < numberOfWorkers) {
+                if (workersList.size() < numberOfWorkers && !lettersInProgress.contains(candidate)) {
                     workersList.add(Pair.with(letterTime, candidate));
                 }
             }
@@ -186,20 +187,21 @@ public class Day07part2 {
             Collections.sort(workersList, Comparator.comparing(Pair<Integer, Character>::getValue0));
             System.out.println(workersList);
 
-            Set<Character> lettersInProgress = new HashSet<>();
             for (Pair letterInProgress : workersList) {
                 lettersInProgress.add((char) letterInProgress.getValue1());
             }
 
             int removedLettertime = workersList.get(0).getValue0();
             totalTime += removedLettertime;
+            char letterDone = workersList.get(0).getValue1();
             workersList.remove(0);
             for (int worker = 0; worker < workersList.size(); worker++) {
                 int subtractedTimeFromRemainingLetters = workersList.get(worker).getValue0() - removedLettertime;
                 char letterInProcess = workersList.get(worker).getValue1();
                 workersList.set(worker, Pair.with(subtractedTimeFromRemainingLetters, letterInProcess));
             }
-            relatedLettersList.removeIf(letter -> lettersInProgress.contains(letter[0]));
+            lettersInProgress.remove(letterDone);
+            relatedLettersList.removeIf(letter -> letter[0]==letterDone);
         }
 
         System.out.println(totalTime+lastLetterInWordTimeToProcess);
