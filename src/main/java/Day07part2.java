@@ -119,10 +119,10 @@ public class Day07part2 {
                 "Step F must be finished before step E can begin.";
 
 
-        int numberOfWorkers = 2;
-        int stepTime = 0;
+        int numberOfWorkers = 5;
+        int stepTime = 60;
 
-        String[] inputArray = testInput.split("\n");
+        String[] inputArray = input.split("\n");
         List<Pair<Integer, Character>> workersList = new ArrayList<>();
         Set<Character> availableLetters = new HashSet<>();
         List<char[]> relatedLettersList = new ArrayList<>();
